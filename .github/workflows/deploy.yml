@@ -10,30 +10,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout your repository
+      # 1. Checkout code
       - uses: actions/checkout@v4
 
-      # Step 2: Setup PHP 8.2
+      # 2. Setup PHP 8.2
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, bcmath, pcntl, curl
-          ini-values: post_max_size=256M, upload_max_filesize=256M
+          extensions: mbstring, bcmath, curl, xml, tokenizer, json, gd
 
-      # Step 3: Install Composer dependencies
+      # 3. Install Composer dependencies
       - run: composer install --no-dev --optimize-autoloader
+        env:
+          COMPOSER_PROCESS_TIMEOUT: 0
+          COMPOSER_NO_INTERACTION: 1
+          COMPOSER_NO_AUDIT: 1
 
-      # Step 4: Setup Node.js
+      # 4. Clear Laravel cache
+      - name: Clear Laravel cache
+        run: |
+          php artisan config:clear
+          php artisan cache:clear
+          php artisan route:clear
+          php artisan view:clear
+
+      # 5. Setup Node.js
       - uses: actions/setup-node@v4
         with:
           node-version: '18'
 
-      # Step 5: Install npm packages and build frontend
+      # 6. Install Node dependencies and build
       - run: |
           npm install
           npm run build
 
-      # Step 6: Deploy via FTP
+      # 7. Deploy to FTP
       - uses: SamKirkland/FTP-Deploy-Action@v4.3.0
         with:
           server: ${{ secrets.FTP_SERVER }}
