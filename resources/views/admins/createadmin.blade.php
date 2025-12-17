@@ -6,6 +6,12 @@
         {{ session('success') }}
     </div>
 @endif
+
+@if (session('delete'))
+    <div class="alert alert-success">
+        {{ session('delete') }}
+    </div>
+@endif
   <form method="POST" action="{{ route('createadmins.store') }}">
     @csrf
 

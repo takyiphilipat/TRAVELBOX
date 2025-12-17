@@ -10,7 +10,7 @@ class UserController extends Controller
 {
     public function booking()
     {
-        $bookings = Reservation::where('user_id', Auth::id())->get();
+        $bookings = Reservation::where('user_id', Auth::id())->orderBy('id','desc')->get();
 
         return view('users.booking', compact('bookings'));
     }
