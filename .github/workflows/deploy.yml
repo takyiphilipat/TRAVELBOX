@@ -10,22 +10,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout your repository
       - uses: actions/checkout@v4
 
+      # Step 2: Setup PHP 8.2
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
+          extensions: mbstring, bcmath, pcntl, curl
+          ini-values: post_max_size=256M, upload_max_filesize=256M
 
+      # Step 3: Install Composer dependencies
       - run: composer install --no-dev --optimize-autoloader
 
+      # Step 4: Setup Node.js
       - uses: actions/setup-node@v4
         with:
           node-version: '18'
 
+      # Step 5: Install npm packages and build frontend
       - run: |
           npm install
           npm run build
 
+      # Step 6: Deploy via FTP
       - uses: SamKirkland/FTP-Deploy-Action@v4.3.0
         with:
           server: ${{ secrets.FTP_SERVER }}
