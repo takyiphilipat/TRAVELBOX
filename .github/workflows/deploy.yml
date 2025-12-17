@@ -3,7 +3,7 @@ name: Deploy to windtravel.free.nf
 on:
   push:
     branches:
-      - main  # deploys when you push to main branch
+      - main
 
 jobs:
   deploy:
@@ -36,16 +36,23 @@ jobs:
           npm install
           npm run build
 
-      # 6. Clear Laravel cache (optional but recommended)
+      # 6. Clear Laravel cache
       - run: |
           php artisan config:cache
           php artisan route:cache
           php artisan view:cache
 
-      # 7. Deploy to FTP
-      - uses: SamKirkland/FTP-Deploy-Action@v4.3.0
+      # 7. Deploy Laravel core (exclude public)
+      - name: Deploy Laravel core to FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.0
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /htdocs/laravel/ # <-- default folder for your website
+          local-dir: ./
+          server-dir: /windtravel.free.nf/htdocs/laravel/
+          exclude: |
+            public/**
+            .git/**
+            .github/**
+            node_modules/**
